@@ -59,46 +59,135 @@ Register API call for Token Issuer to be registered on the MAP.
 }
 ```
 
-Basic flow is as follows. Token Issuer, depending on the blockchain on which the token is, will use different sort of signature address format, and signed public address. Hence, by sending the address, signed address, and specific blockchain, MAP system can know which kind of signature algorithm to use in order to check wheather the sender is the real owner of this address.
+Token Issuer, depending on the blockchain on which the token is, will use different sort of signature address format, and signed public address. Hence, by sending the address, signed address, and specific blockchain, MAP system can know which kind of signature algorithm to use in order to check wheather the sender is the real owner of this address.
+Field `data` is not required, and serves as a additional data about issuer if Token Issuer is willing to provide some.
 
 #### Assets
 
 ##### Register
 Registered Token Issuer can add a new Asset to the system, represented by a (Smart Contract Address/Specific Blockchain) pair.
-
+- Action - `POST`
+- Path - `/asset/register`
+- Request Body  
+```
+{
+    assetAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    blockchain: "Ethereum",
+    assetOwnerAddress: "2HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN"
+    signedOwnerAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=",
+    assetDNA: "QmWmyoMoctfbAaiEs2G46gpeUmhqFRDW6KWo64y5r581Vz"
+}
+```
+Token Issuer with it's Owner Address, from which asset itself was deployed to specific blockchain, specifies address of the Asset and sends signed Owner public address. With these informations, MAP can check if Token Issuer is really the Issuer of that Asset on the specified blockchain.
+AssetDNA is IPFS hash of additional info about the token itself.
+- Return body
+```
+{
+    mapAssetAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN"
+}
+```
 ##### Register Qualification Provider
 Register Qualification Provider for the Token, API call is performed by registered Token Issuer. Multiple Qualification Providers can be added to one Asset. 
+- Action - `POST`
+- Path - `/asset/qp/register`
+- Request Body  
+```
+{
+    mapAssetAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    mapQualificationProviderAddress: "3HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN" 
+}
+```
+
+Qualification Provider Address is the address of QP that is already registered provider on MAP system.
 
 ##### Get Qualification Provider
 Get Qualification Provider for a Token API call returns a list of Qualification Provider associated with the Token.
+- Action - `GET`
+- Path - `/asset/{mapAssetAddress}/qp`
+- Return Body  
+```
+[
+{
+    mapQualificationProviderAddress: "3HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    additionalInfo: {...}
+},
+...
+]
+```
+
+As a response sender will receive a list of Qualification Providers, and associted details, for the desired token.
+
 
 ### Qualification Provider
 
 #### Register
 Register API calls for Qualification Provider to be registered on the MAP.
+- Action - `POST`
+- Path - `/qp/register`
+- Request Body  
+```
+{
+    address: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    blockchain: "Bitcoin",
+    signedAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=",
+    data: "0x1d4d691d0000000000000000000000001550d41be3651686e1aeeea073d8d403d0bd2e3000000000000000000000000000000000000000000000000c328093e61ee40000000000000000000000000000960b236a07cf122663c4303350609a66a7b288c000000000000000000000000038bc9915922ba42bb67a804befa510e4bbbfb4ba0000000000000000000000000000000000000000000000000c2d86e5d90486a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005c3dd901000000000000000000000000000000000000000000000000000000000335afd4000000000000000000000000000000000000000000000000000000000000001cd2fc85ad3c239eb9c917f2701ba9c24e6a7730b40fd6abe5eea3a0b24a4b844131eb70cd49838d8cec541c4073d209eedc4400a042c771140f86086fe2cde64d"
+}
+```
+Field `data` serves as a additional data about QP.
+
+As a response from the MAP QP will receive `qp.txt` that needs to be placed in the root of QP's website. The MAP system will check if the file is present on the server and active the QP in the system after the check is done.
 
 #### Broadcast Qualification for a DID
-Investor initiates this action to get Qualification. A Qualification check, i.e. KYC check, is performed by sending all necessary data to the Swarm Fund API (both document scans and textual info). It is expected that after a couple of hours, the results will be back and the user can check them by sending another request to the Swarm API. 
+Once Investor obtains info about QP by using [Get Qualification Provider](#get-qualification-provider) call, and has done all the required checks on the QP's platform to get Qualification, the QP will broadcast Qualification to MAP.
+- Action - `POST`
+- Path - `/qp/qualification/broadcast`
+- Request Body  
+```
+{
+    mapQualificationProviderAddress: "3HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    signedQualificationProvideAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=",
+    qualificationData: "0x1d4d691d0000000000000000000000001550d41be3651686e1aeeea073d8d403d0bd2e3000000000000000000000000000000000000000000000000c328093e61ee40000000000000000000000000000960b236a07cf122663c4303350609a66a7b288c000000000000000000000000038bc9915922ba42bb67a804befa510e4bbbfb4ba0000000000000000000000000000000000000000000000000c2d86e5d90486a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005c3dd901000000000000000000000000000000000000000000000000000000000335afd4000000000000000000000000000000000000000000000000000000000000001cd2fc85ad3c239eb9c917f2701ba9c24e6a7730b40fd6abe5eea3a0b24a4b844131eb70cd49838d8cec541c4073d209eedc4400a042c771140f86086fe2cde64d"
+    did: "4HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN"
+    qualificationHash: "0xf9925d96a17cd75d084cecafd8f630a6af9c0423306239f7e326f724891909cc"
+}
+```
 
-This is important to note that the Swarm API will never initiate requests (e.g. notifying when something is finished), it will only dispense responses to the best of it's knowledge. 
-
-The response of this API call is Qualification - ID and data connected with this Qualification and Qualification Providers that has approved Investor.
+DID is basically an public key that Investor, while doing a check on QP services, provided and which he can claim to be his own. Field qualificationData holds specific details of this qualification.
 
 ### Investor
 
 #### Broadcast Association
-Once Investor has obtained Qualification he can broadcast Association data connected with this Qualification via this API call. Because of this Proofs of Qualification and Association, behind the scenes Investor’s Qualification data, Wallet address, Quality provider are all connected.
+Once Investor has obtained and claimed, via DID, the Qualification he can broadcast Association data connected with this Qualification via this API call. Because of this Proofs of Qualification and Association, behind the scenes Investor’s Qualification data, Wallet address, Quality provider are all connected.
+- Action - `POST`
+- Path - `investor/association/broadcast`
+- Request Body  
+```
+{
+    address: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    blockchain: "Bitcoin",
+    signedAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=",
+    did: "4HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    signedDid: "4HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=",
+    qualificationHash: "0xf9925d96a17cd75d084cecafd8f630a6af9c0423306239f7e326f724891909cc"
+}
+```
 
+By sending his Address, proof of ownership for this Address, DID (public key) and proof of ownership for this DID, and finally qualificationHash, MAP system can know that this Address can be associated with specific qualification.
 ### Services (e.g. Exchanges, Wallets)
 
-#### Check Qualification for an Address
+#### Check Qualification and Association for an Address
 Check if the Wallet Address has Qualification and which is Qualification Provider connected with that Address.
-
-### Association
-
-### Qualification
-
-
+- Action - `GET`
+- Path - `/check/{blockchain}/{address}`
+- Return Body  
+```
+{
+    mapQualificationProviderAddress: "3HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    qualificationData: "0x1d4d691d0000000000000000000000001550d41be3651686e1aeeea073d8d403d0bd2e3000000000000000000000000000000000000000000000000c328093e61ee40000000000000000000000000000960b236a07cf122663c4303350609a66a7b288c000000000000000000000000038bc9915922ba42bb67a804befa510e4bbbfb4ba0000000000000000000000000000000000000000000000000c2d86e5d90486a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005c3dd901000000000000000000000000000000000000000000000000000000000335afd4000000000000000000000000000000000000000000000000000000000000001cd2fc85ad3c239eb9c917f2701ba9c24e6a7730b40fd6abe5eea3a0b24a4b844131eb70cd49838d8cec541c4073d209eedc4400a042c771140f86086fe2cde64d"
+    qualificationHash: "0xf9925d96a17cd75d084cecafd8f630a6af9c0423306239f7e326f724891909cc"
+}
+```
+Most important field here is `qualificationData` which holds specific details of this qualification, if any qualification is associated with this address.
 ### Example flow
 
 Flow of actions described so far is as follows: 
