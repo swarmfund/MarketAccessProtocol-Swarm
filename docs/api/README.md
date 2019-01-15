@@ -25,7 +25,20 @@ We aim to support most languages for frontend and backend developers. We will pr
 
 ## API Reference
 
-- [Token Issuer](#token-ssuer)
+- [Token Issuer](#token-issuer)
+  - [Register](#register)
+  - [Assets](#assets)
+    - [Register](#register-1)
+    - [Register Qualification Provider](#register-qualification-provider)
+    - [Get Qualification Provider](#get-qualification-provider)
+- [Qualification Provider](#qualification-provider)
+  - [Register](#register-2)
+  - [Register Qualification for an Address](#register-qualification-for-an-address)
+- [Investor](#investor)
+  - [Register Qualification](#register-qualification)
+  - [Broadcast Association](#broadcast-association)
+- [Services (e.g. Exchanges, Wallets)](#services-eg-exchanges-wallets)
+  - [Check Qualification](#check-qualification)
 
 ### Token Issuer
 
@@ -58,7 +71,7 @@ The response of this API call is Qualification - ID and data connected with this
 ### Investor
 
 #### Register Qualification
-see [Register Qualification For An Address](#Register Qualification for an Address)
+see [Register Qualification For An Address](#register-qualification-for-an-address)
 
 #### Broadcast Association
 Once Investor has obtained Qualification he can broadcast Association data connected with this Qualification via this API call. Because of this Proofs of Qualification and Association, behind the scenes Investor’s Qualification data, Wallet address, Quality provider are all connected.
