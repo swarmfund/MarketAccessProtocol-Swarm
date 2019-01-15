@@ -37,17 +37,29 @@ We aim to support most languages for frontend and backend developers. We will pr
     - [Get Qualification Provider](#get-qualification-provider)
 - [Qualification Provider](#qualification-provider)
   - [Register](#register-2)
-  - [Register Qualification for an Address](#register-qualification-for-an-address)
+  - [Broadcast Qualification](#broadcast-qualification-for-a-did)
 - [Investor](#investor)
-  - [Register Qualification](#register-qualification)
   - [Broadcast Association](#broadcast-association)
 - [Services (e.g. Exchanges, Wallets)](#services-eg-exchanges-wallets)
-  - [Check Qualification](#check-qualification)
+  - [Check Qualification for an Address](#check-qualification-for-and-address)
 
 ### Token Issuer
 
 #### Register
 Register API call for Token Issuer to be registered on the MAP.
+- Action - `POST`
+- Path - `/issuer/register`
+- Request Body  
+```
+{
+    address: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN",
+    blockchain: "Bitcoin",
+    signedAddress: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=",
+    data: "0x1d4d691d0000000000000000000000001550d41be3651686e1aeeea073d8d403d0bd2e3000000000000000000000000000000000000000000000000c328093e61ee40000000000000000000000000000960b236a07cf122663c4303350609a66a7b288c000000000000000000000000038bc9915922ba42bb67a804befa510e4bbbfb4ba0000000000000000000000000000000000000000000000000c2d86e5d90486a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005c3dd901000000000000000000000000000000000000000000000000000000000335afd4000000000000000000000000000000000000000000000000000000000000001cd2fc85ad3c239eb9c917f2701ba9c24e6a7730b40fd6abe5eea3a0b24a4b844131eb70cd49838d8cec541c4073d209eedc4400a042c771140f86086fe2cde64d"
+}
+```
+
+Basic flow is as follows. Token Issuer, depending on the blockchain on which the token is, will use different sort of signature address format, and signed public address. Hence, by sending the address, signed address, and specific blockchain, MAP system can know which kind of signature algorithm to use in order to check wheather the sender is the real owner of this address.
 
 #### Assets
 
@@ -65,7 +77,7 @@ Get Qualification Provider for a Token API call returns a list of Qualification 
 #### Register
 Register API calls for Qualification Provider to be registered on the MAP.
 
-#### Register Qualification for an Address
+#### Broadcast Qualification for a DID
 Investor initiates this action to get Qualification. A Qualification check, i.e. KYC check, is performed by sending all necessary data to the Swarm Fund API (both document scans and textual info). It is expected that after a couple of hours, the results will be back and the user can check them by sending another request to the Swarm API. 
 
 This is important to note that the Swarm API will never initiate requests (e.g. notifying when something is finished), it will only dispense responses to the best of it's knowledge. 
@@ -74,15 +86,12 @@ The response of this API call is Qualification - ID and data connected with this
 
 ### Investor
 
-#### Register Qualification
-see [Register Qualification For An Address](#register-qualification-for-an-address)
-
 #### Broadcast Association
 Once Investor has obtained Qualification he can broadcast Association data connected with this Qualification via this API call. Because of this Proofs of Qualification and Association, behind the scenes Investor’s Qualification data, Wallet address, Quality provider are all connected.
 
 ### Services (e.g. Exchanges, Wallets)
 
-#### Check Qualification
+#### Check Qualification for an Address
 Check if the Wallet Address has Qualification and which is Qualification Provider connected with that Address.
 
 ### Association
