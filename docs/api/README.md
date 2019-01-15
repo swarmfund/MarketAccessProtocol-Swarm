@@ -25,7 +25,7 @@ We aim to support most languages for frontend and backend developers. We will pr
 
 ## API Reference
 
-- Token Issuer(#Token Issuer)
+- [Token Issuer](#Token Issuer)
 
 ### Token Issuer
 
@@ -40,7 +40,7 @@ Registered Token Issuer can add a new Asset to the system, represented by a (Sma
 ##### Register Qualification Provider
 Register Qualification Provider for the Token, API call is performed by registered Token Issuer. Multiple Qualification Providers can be added to one Asset. 
 
-#####G et Qualification Provider
+##### Get Qualification Provider
 Get Qualification Provider for a Token API call returns a list of Qualification Provider associated with the Token.
 
 ### Qualification Provider
