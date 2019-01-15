@@ -25,7 +25,7 @@ We aim to support most languages for frontend and backend developers. We will pr
 
 ## API Reference
 
-- [Token Issuer](#Token Issuer)
+- [Token Issuer](#token-ssuer)
 
 ### Token Issuer
 
