@@ -1,4 +1,8 @@
 
+# What is the MAP API?
+
+Market Access Protocol API enables convenient access to MAP via RESTful experience. 
+
 ## RESTful
 The MAP API is RESTful, meaning that all API calls are stateless and can be used without maintaining local duplicated state in the implementing application.
 
