@@ -17,7 +17,7 @@ to easily integrate and add a compliance layer to any cryptocurrency based digit
 
 ## URL and REST structure
 
-MAP API uses HTTPS only. All requests in HTTP will be completely ignored.
+MAP API uses HTTPS only. All HTTP requests will be completely ignored.
 
 The API relies on REST HTTP verbs to interact with the objects in the system. 
 
@@ -50,7 +50,7 @@ Relationships are created between resources using the PUT action. The exact reso
 ## Response structure
 
 
-Standard response structure will include the following header:
+A standard response structure will include the following header:
 
     `Content-Type: application/json`
     
@@ -111,9 +111,9 @@ Whenever authentication is needed, these HTTP headers are required:
 
 | Header name      | Description                                                                                   | Example                            |
 |------------------|-----------------------------------------------------------------------------------------------|------------------------------------|
-| X-Swm-Blockchain | The underlying blockchain of the wallet, needed to determine the exact signing algorithm used | Bitcoin                            |
-| X-Swm-Address    | The public key of the wallet                                                                  | 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN |
-| X-Swm-Signature  | The wallet address signed by the wallet's private key                                         |  NG8tFK3dNwQaiYA0VOu...            |
+| X-MAP-Blockchain | The underlying blockchain of the wallet, needed to determine the exact signing algorithm used | Bitcoin                            |
+| X-MAP-Address    | The public key of the wallet                                                                  | 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN |
+| X-MAP-Signature  | The wallet address signed by the wallet's private key                                         |  NG8tFK3dNwQaiYA0VOu...            |
 
 
 > ***WARNING:*** We **strongly** recommend generating a new wallet when first registering with MAP to prevent use of a signed public key that is compromised from a third-party service which uses a similar authentication scheme.
@@ -140,7 +140,7 @@ The qualification provider is a user which is able to provide KYC-like complianc
 
 ## Token issuer
 
-The token issuer is the user which is able to register an asset on the MAP blockchain.
+The token issuer is the user which registers an asset on the MAP blockchain.
 
 1. [Register](#reference/token-issuer/api-calls/register)
 2. [Get token issuer](#reference/token-issuer/api-calls/get-token-issuer)
@@ -150,7 +150,7 @@ The token issuer is the user which is able to register an asset on the MAP block
 6. [Update wallet connection request](#reference/token-issuer/api-calls/update-wallet-connection-request)
 7. [Update Token Fundamentals](#reference/token-issuer/api-calls/update-token-dna)
 
-<!--![Token Issuer Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Token-issuer-light.svg)-->
+    <!--![Token Issuer Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Token-issuer-light.svg)-->
 
 ## Investor
 
@@ -178,26 +178,26 @@ The Swarm MAP blockchain is an immutable store of records that has two basic typ
 ## Transfer Restriction rules
 
 
-The Transfer Restriction rule section of the Token Fundamentals document describes the rules that every transfer has to abide by, to be permitted to transact. Since rules can include properties that are only known by the token contract itself ar the time of transfer, they are defined in two groups:
-1. rules to be checked on-chain where Asset token is deployed
-2. rules that are to be checked on MAP node.
+The Transfer Restriction rule section of the Token Fundamentals document describes the rules that every transfer has to abide by, to be permitted to transact. Since rules can include properties that are only known by the token contract itself at the time of transfer, they are defined in two groups:
+1. rules to be checked natively on-chain where the Token contract is deployed
+2. rules to be checked outside the native chain by MAP nodes.
 
 
 ### Transfer authorization flow
 
 
-Transfer rules which are required to be checked outside of the original chain—by MAP nodes—can be written on or referenced from the Token Fundamentals. Transfer rules which happen on-chain are referenced from the token contract.
+Transfer rules which are required to be checked outside of the original chain—by MAP nodes—can be written on or referenced from the Token Fundamentals. Transfer rules which happen on-chain are referenced from the Token contract.
 
 Transfers that require checks outside the original chain must include an Authorization signature from a MAP node with proof that these checks have been performed.
-An example token contract should have the transfer method with at least the following signature:
+An example Token contract should have the transfer method with at least the following signature:
 
 ```
 transfer(address _to, uint256 _value, uint256 _nonce, uint256 _expiration, bytes32 msgHash, uint8 v, bytes32 r, bytes32 s) public returns (bool success)
 ```
 
-where msgHash consists of `(asset, from, to, data, nonce, expiration)` values and expiration hold time validity of authorization. 
+where msgHash consists of `(asset, from, to, data, nonce, expiration)` values. The **nonce** is used to prevent replay attacks while **expiration** represents the authorization's validity period. 
 
-If the rules in Token Fundamentals include ones checked on Asset Token blockchain, the implemented transfer method on Asset token contract will also check them before allowing transfer to be executed.
+If Token Fundamentals include rules pertinent to the native Token contract’s blockchain, the transfer method implementation should account for additional checks to be performed on-chain before allowing a transfer to be executed.
 
 Transfers that require MAP authorization contain the following properties which are defined by the rules declaratively stated in the Token Fundamentals. 
 1. Asset
@@ -206,7 +206,7 @@ Transfers that require MAP authorization contain the following properties which 
 
 ####Asset properties `(<token> prefix)`
 
-Stable properties acquired from Token Fundamentals document or Token contract.
+Stable properties acquired from Token Fundamentals document or the Token contract.
 1. Creation time
 2. Supply
 3. Decimals
@@ -224,7 +224,7 @@ Properties taken from transfer request.
 
 ####Transfer context `(<ctx> prefix)`
 
-Acquired by MAP node accepting authorization request.
+Delivered to MAP nodes accepting authorization request.
 1. Nonce
 2. Expiration
 3. IP
@@ -239,10 +239,12 @@ Properties MAP holds about objects such as wallets, assets, token issuers, quali
 
 As stated earlier, two sets of transfer restriction rules are defined in Token Fundamentals:
 
-1. Rules enforced on token contract
-2. Rules enforced by MAP
+1. Rules enforced natively on-chain where the token contract is deployed
+2. Rules enforced by MAP which are not possible or economically infeasible to be performed natively on-chain
 
-For now, the first set of rules are defined by a single address of the contract enforcing the rules, and MAP enforced rules are listed in the Token Fundamentals document. Example of rules section of Token Fundamentals:
+For now, the first set of rules are defined by a single address of the contract enforcing the rules, and MAP enforced rules are listed in the Token Fundamentals document. 
+
+Example of the rules section of Token Fundamentals:
 
 ```
 transferRules: {
@@ -287,8 +289,8 @@ Example of Token Fundamentals document follows.
         blockchain: Ethereum,
         network: 1,
         address: "0x...",
-        name: "Swarm token",
-        symbol: "SWT",
+        name: "Security token",
+        symbol: "XYZ",
         decimals: 18,
         supply: 10000000,
         created: "2019-02-19T12:04:50+00:00"  
