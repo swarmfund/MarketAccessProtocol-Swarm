@@ -148,7 +148,7 @@ The token issuer is the user which is able to register an asset on the MAP block
 4. [List of wallet connection requests](#reference/token-issuer/api-calls/list-of-wallet-connection-requests)
 5. [Get wallet connection request](#reference/token-issuer/api-calls/get-wallet-connection-request)
 6. [Update wallet connection request](#reference/token-issuer/api-calls/update-wallet-connection-request)
-7. [Update token DNA](#reference/token-issuer/api-calls/update-token-dna)
+7. [Update Token Fundamentals](#reference/token-issuer/api-calls/update-token-dna)
 
 <!--![Token Issuer Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Token-issuer-light.svg)-->
 
@@ -199,11 +199,14 @@ where msgHash consists of `(asset, from, to, data, nonce, expiration)` values an
 
 If the rules in Token Fundamentals include ones checked on Asset Token blockchain, the implemented transfer method on Asset token contract will also check them before allowing transfer to be executed.
 
-MAP authorization rules declaratively define rules for transfer to be allowed using properties of Asset, Transfer and Transfer Context (External properties?).
+Transfers that require MAP authorization contain the following properties which are defined by the rules declaratively stated in the Token Fundamentals. 
+1. Asset
+2. Transfer
+3. Transfer Context
 
 ####Asset properties `(<token> prefix)`
 
-Stable properties acquired from Token DNA document or Token contract.
+Stable properties acquired from Token Fundamentals document or Token contract.
 1. Creation time
 2. Supply
 3. Decimals
@@ -234,12 +237,12 @@ Properties MAP holds about objects such as wallets, assets, token issuers, quali
 
 ### Transfer restriction rules
 
-As stated earlier, two sets of transfer restriction rules are defined in token DNA:
+As stated earlier, two sets of transfer restriction rules are defined in Token Fundamentals:
 
 1. Rules enforced on token contract
 2. Rules enforced by MAP
 
-For now, the first set of rules are defined by a single address of the contract enforcing the rules, and MAP enforced rules are listed in the Token Fundamentals document. Example of rules section of Token DNA:
+For now, the first set of rules are defined by a single address of the contract enforcing the rules, and MAP enforced rules are listed in the Token Fundamentals document. Example of rules section of Token Fundamentals:
 
 ```
 transferRules: {
@@ -266,7 +269,7 @@ MAP transfer restriction definition section of transfer rules has the following 
 3. `description`: URL of a document describing contained rules to investors. 
 4. `rules`: JSON document with a definition of rules for the type.
 
-MAP node needs to have an implementation of rule checks for transfer_rules.map.type, or transfer restriction authorizations will return an error indicating unknown rule type in token DNA.
+MAP node needs to have an implementation of rule checks for transfer_rules.map.type, or transfer restriction authorizations will return an error indicating unknown rule type in Token Fundamentals.
 
 ## Token Fundamentals document
 
@@ -276,7 +279,7 @@ Token Fundamentals document has, at least, the following top level properties:
 2. `properties`: various token properties, like an icon, description, etc.
 3. `transferRules`: properties defining on-chain and MAP transfer rules.
 
-Example of token DNA document follows.
+Example of Token Fundamentals document follows.
 
 ```
 {
@@ -581,9 +584,9 @@ Update specific wallet connection request. This call is used to reassign Identit
 
 + Response 200 (application/json)
 
-### Update token DNA [PUT /token-issuers/{pubKey}/assets/{pubKey}/dnas]
+### Update Token Fundamentals [PUT /token-issuers/{pubKey}/assets/{pubKey}/dnas]
 
-Update token DNA document properties. 
+Update Token Fundamentals document properties. 
 
 + Request 
     + Body 
@@ -644,9 +647,10 @@ Request data object is encrypted with designated Asset's Token Issuer key.
 + Response 500 (application/json)
 
 
-### Get Authorization signature [GET /authotizations]
+### Get Authorization signature [GET /authorizations]
 
-Wallet owners, before sending the transaction to Token contract that has defined MAP transfer restrictions, have to acquire transfer authorization from MAP, when all rules will be checked for authorization eventually returned to wallet owner.
+An Authorization signature must be obtained for transfer rules which require checks made by MAP. 
+This authorization needs to be obtained before the transfer method is called in the token contract and is given after all rules are checked by MAP nodes.
 
 Authorization returned needs to carry a relatively short expiration time, to prevent a user pre-acquiring it.
 
@@ -713,7 +717,7 @@ Retreive Certificate Claim for Investor.
 + uid: `The asset uid` (string, required)
 + name: `The user-provided arbitrary name of the asset` (string, required)
 + description: `The user-provided arbitrary description of the asset` (string, required)
-+ dna: `The token DNA` (Dna, required)
++ dna: `The Token Fundamentals` (Dna, required)
 
 
 ## Qualification provider (object)
