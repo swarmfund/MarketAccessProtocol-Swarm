@@ -254,7 +254,7 @@ transferRules: {
     map: {
         type: "cert-list",
         version: 1,
-        description: "https://swarm.fund/assets/SWT/rules.html"
+        description: "https://example/assets/XYZ/rules.html"
         rules: [{
             ...
         }]
@@ -266,20 +266,20 @@ transferRules: {
 
 MAP transfer restriction definition section of transfer rules has the following properties:
 
-1. `type`: defines the type of rules listed in rules property, allowing a token issuer to choose how rules are going to be defined, using different implementations to check them. For example, “cert-list” type will just list all certification types wallets needs to have for simple rule engine to check, but “swarm-rules” can include much more complex rules.
+1. `type`: defines the type of rules listed in the rules property, allowing a token issuer to choose how rules are going to be defined, using different implementations to check them. For example, “cert-list” type will just list all certification types wallets needs to have for a simple rule engine to check, but “swarm-rules” can include a much more complex set of rules.
 2. `version`: maybe not needed as type can handle versioning issues.
-3. `description`: URL of a document describing contained rules to investors. 
-4. `rules`: JSON document with a definition of rules for the type.
+3. `description`: URL of a document describing token transfer rules to investors. 
+4. `rules`: JSON document with a definition of rules for the specific type.
 
-MAP node needs to have an implementation of rule checks for transfer_rules.map.type, or transfer restriction authorizations will return an error indicating unknown rule type in Token Fundamentals.
+MAP nodes need to have an implementation of rule checks for transfer_rules.map.type, or transfer restriction authorizations will return an error indicating unknown rule type in Token Fundamentals.
 
 ## Token Fundamentals document
 
 Token Fundamentals document has, at least, the following top level properties:
 
-1. `token`: listing token properties which can be used on MAP node.
+1. `token`: token properties listing which can be used on MAP node.
 2. `properties`: various token properties, like an icon, description, etc.
-3. `transferRules`: properties defining on-chain and MAP transfer rules.
+3. `transferRules`: properties defining native on-chain and MAP transfer rules.
 
 Example of Token Fundamentals document follows.
 
@@ -305,7 +305,7 @@ Example of Token Fundamentals document follows.
     map: {
         type: "cert-list",
         version: 1,
-        description: "https://swarm.fund/assets/SWT/rules.html"
+        description: "https://example/assets/XYZ/rules.html"
         rules: [{
             ...
         }]
@@ -318,8 +318,8 @@ Example of Token Fundamentals document follows.
 
 # Group Qualification Provider
 
-Qualification providers are entities which can verify information about identities and issue different types of trusted certificates. Qualification providers define details about their certificates and the required data the subject needs to provide to obtain each one. One example of such certificates would be a KYC certificate that can be issued to prospective investors. Qualification providers must register themselves and update a list of their certificates 
-on MAP, with certificates identified by unique id.
+Qualification providers are entities which can verify information about identities and issue different types of trusted certificates. Qualification providers define details about their certificates and the required data the subject needs to provide in order to obtain one. One example of such certificates would be a KYC certificate that can be issued to prospective investors. Qualification providers must register themselves and update a list of their certificates 
+on MAP, with certificates identified by a unique id.
 
 Instances of certificates issued to subject identities are Claims. Information about the existence of a Claim is
 registered on MAP, along with the basic data required to check the availability of registered Claim. The claim is identified by a certificate's unique id and subject's public key.
