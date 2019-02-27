@@ -186,9 +186,10 @@ The Transfer Restriction rule section of the Token Fundamentals document describ
 ### Transfer authorization flow
 
 
-Before any Asset transfer can be executed, it needs to comply with the transfer rules listed in Token Fundamentals. The Token Asset contract should be set up to be aware of the existence of a contract or MAP transfer rules in Token Fundamentals.
+Transfer rules which are required to be checked outside of the original chain—by MAP nodes—can be written on or referenced from the Token Fundamentals. Transfer rules which happen on-chain are referenced from the token contract.
 
-If the rules in Token Fundamentals include ones checked on the MAP node, transfer data sent to Asset Token has to include Authorization signature from MAP node, proving rules have been validated. Example contract’s transfer method should have at least following signature:
+Transfers that require checks outside the original chain must include an Authorization signature from a MAP node with proof that these checks have been performed.
+An example token contract should have the transfer method with at least the following signature:
 
 ```
 transfer(address _to, uint256 _value, uint256 _nonce, uint256 _expiration, bytes32 msgHash, uint8 v, bytes32 r, bytes32 s) public returns (bool success)
