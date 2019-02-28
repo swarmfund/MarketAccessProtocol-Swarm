@@ -148,7 +148,7 @@ The token issuer is the user which registers an asset on the MAP blockchain.
 4. [List of wallet connection requests](#reference/token-issuer/api-calls/list-of-wallet-connection-requests)
 5. [Get wallet connection request](#reference/token-issuer/api-calls/get-wallet-connection-request)
 6. [Update wallet connection request](#reference/token-issuer/api-calls/update-wallet-connection-request)
-7. [Update Token Fundamentals](#reference/token-issuer/api-calls/update-token-dna)
+7. [Update Token Fundamentals](#reference/token-issuer/api-calls/update-token-fundamentals)
 
     <!--![Token Issuer Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Token-issuer-light.svg)-->
 
@@ -318,11 +318,11 @@ Example of Token Fundamentals document follows.
 
 # Group Qualification Provider
 
-Qualification providers are entities which can verify information about identities and issue different types of trusted certificates. Qualification providers define details about their certificates and the required data the subject needs to provide in order to obtain one. One example of such certificates would be a KYC certificate that can be issued to prospective investors. Qualification providers must register themselves and update a list of their certificates 
-on MAP, with certificates identified by a unique id.
+Qualification providers are entities which can verify information about identities and issue different types of trusted certificates. Qualification providers define details about their certificates and the required data the subject needs to provide in order to obtain one. One example of such certificates would be a KYC certificate that can be issued to prospective investors. Qualification providers must register themselves and update a list of their supported certificates 
+on MAP, with certificate types identified by a unique id.
 
 Instances of certificates issued to subject identities are Claims. Information about the existence of a Claim is
-registered on MAP, along with the basic data required to check the availability of registered Claim. The claim is identified by a certificate's unique id and subject's public key.
+registered on MAP, along with the basic data required to check the availability of registered Claim. The Claim is identified by a certificate's unique id and subject's public key.
 
 ## API Calls [/qualification-providers]
 
@@ -334,7 +334,7 @@ Registers new Qualification Provider.
 
     + Headers
         
-            X-Swm-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
@@ -354,7 +354,7 @@ Registers new Qualification Provider.
 
 ## Get Qualification Provider [GET /qualification-providers/{pubKey}]
 
-Retreive Qualification Provider object.
+Retrieve Qualification Provider object.
 
 + Request
 
@@ -378,7 +378,7 @@ Register possible Certificate by Qualification Provider on MAP.
     
     + Headers
 
-            X-Swm-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
@@ -423,7 +423,7 @@ Get details about specific certificate.
 
 ### Delete Certificate [DELETE /qualification-providers/{pubKey}/certificates/{uid}]
 
-Remove Certificate registration. Further Claim registration on this Certificate is not possible, but issued claims using this Certificate remain valid until specific invalidation.
+Remove Certificate registration. Further Claim registration on this Certificate is not possible, but issued Claims using this Certificate remain valid until specific invalidation.
 
 + Request (application/json)
 
@@ -431,14 +431,14 @@ Remove Certificate registration. Further Claim registration on this Certificate 
 
 ## Claims [/claims]
 
-### Register claim about investor [POST /qualification-providers/{pubKey}/claims]
+### Register Claim about investor [POST /qualification-providers/{pubKey}/claims]
 
 Register issuance of Claim for specific Investor and Certificate.
 
 + Request (application/json)
     + Headers
 
-            X-Swm-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
@@ -469,9 +469,9 @@ Register issuance of Claim for specific Investor and Certificate.
 
 # Group Token Issuer
 
-Token issuers are entities who control asset token operations, and on MAP are primarily responsible for asset and investor's wallet registration. They need to register themselves on the MAP for other parties to authenticate their actions. 
+Token issuers are entities who control token operations, and on MAP are primarily responsible for token and investor's wallet registration. They need to register themselves on the MAP for other parties to authenticate their actions. 
 
-Apart from simple registration of themselves and their assets, the most important task Token issuers are handling
+Apart from simple registration of themselves and their tokens, the most important task Token issuers are handling
 is responding to Investor's wallet registration requests - separating Investor's Wallet from Investor's claims. 
 Token issuers are the only entities in MAP in possession of Investor-Wallet connection information, handling registration tasks and saving connection information off-site.
 
@@ -485,7 +485,7 @@ Registers the token issuer.
 
     + Headers
         
-            X-Swm-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Attributes
     
@@ -512,7 +512,7 @@ Adds a new Asset to the MAP blockchain.
 
     + Headers
         
-            X-Swm-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
@@ -523,7 +523,7 @@ Adds a new Asset to the MAP blockchain.
                 symbol: "",
                 decimals: 0,
                 supply: 0,
-                dna: {
+                fundamentals: {
                     hash: "",
                     url: ""
                 }
@@ -538,7 +538,7 @@ Adds a new Asset to the MAP blockchain.
         + decimals: `Token decimals` (number, required)
         + supply: `Initial token supply` (number, required)
         + properties: `Some other fields that will be inserted` (string, optional)
-        + dna: `Asset description document` (Dna, required)
+        + fundamentals: `Asset description document` (fundamentals, required)
 
 + Response 201 (application/json)
 
@@ -571,7 +571,7 @@ Retrieve specific wallet connection request.
 
 ### Update wallet connection request [PUT /token-issuers/{pubKey}/assets/{pubKey}/requests/{uid}]
 
-Update specific wallet connection request. This call is used to reassign Identity claims to Wallet. 
+Update specific wallet connection request. This call is used to reassign Identity claims to a Wallet. 
 
 + Request 
     + Body 
@@ -586,7 +586,7 @@ Update specific wallet connection request. This call is used to reassign Identit
 
 + Response 200 (application/json)
 
-### Update Token Fundamentals [PUT /token-issuers/{pubKey}/assets/{pubKey}/dnas]
+### Update Token Fundamentals [PUT /token-issuers/{pubKey}/assets/{pubKey}/fundamentals]
 
 Update Token Fundamentals document properties. 
 
@@ -597,7 +597,7 @@ Update Token Fundamentals document properties.
             url: ""
         }
     
-    + Attributes (Dna)
+    + Attributes (fundamentals)
 
 + Response 200 (application/json)
 
@@ -613,12 +613,12 @@ Protection of Investor's privacy is accomplished by separating Wallet and Invest
 connection information off-site from MAP in the Token Issuer's records. Wallet registration flow facilitates that
 separation:
 
-1. An investor sends a Wallet registration request for selected Asset to MAP, encrypting the whole request object in such a manner that only destination Token Issuer can read information about Investor and connecting Wallet.
+1. An investor sends a Wallet registration request for a selected Asset to MAP, encrypting the whole request object in such a manner that only the destination Token Issuer can read the information about the Investor and the connecting Wallet.
 
-2. Token issuer handles the request by recording Investor-Wallet connections for possible future regulatory queries, reissuing Investor claims with the same certificates and properties, and connecting a new Wallet's public key.
+2. The Token issuer handles the request by recording Investor-Wallet connections for possible future regulatory queries, reissuing Investor claims with the same certificates and properties, and connecting a new Wallet's public key.
 
 
-Any entity wishing to check a Wallet's certificates for a particular Asset can use the Token Issuer claims about that Wallet, extending trust from Qualification Provider to Token Issuer of the particular Asset.
+Any entity wishing to check a Wallet's certificates for a particular Token can use the Token Issuer claims about that Wallet, extending trust from Qualification Provider to the Issuer of the particular token.
 
 ### Send wallet connection request [POST /token-issuers/{pubKey}/assets/{pubKey}/requests]
 
@@ -630,7 +630,7 @@ Send register wallet request with Asset to token Issuer. Encrypted request data 
 4. Wallet signature
 5. Decrypted Investor claim properties
 
-Request data object is encrypted with designated Asset's Token Issuer key.
+Request data object is encrypted with the designated Asset's Token Issuer key.
 
 + Request (application/json)
 
@@ -654,7 +654,7 @@ Request data object is encrypted with designated Asset's Token Issuer key.
 An Authorization signature must be obtained for transfer rules which require checks made by MAP. 
 This authorization needs to be obtained before the transfer method is called in the token contract and is given after all rules are checked by MAP nodes.
 
-Authorization returned needs to carry a relatively short expiration time, to prevent a user pre-acquiring it.
+Authorization returned needs to carry a relatively short expiration time, to prevent a user from using it too far into the future.
 
 
 + Request (application/json)
@@ -681,18 +681,18 @@ Authorization returned needs to carry a relatively short expiration time, to pre
         + value: `Transfer value` (string, required)
         + authorization: `signed authorization data <asset/from/to/value/nonce/expiration>` (string, required)
         + nonce: `Incremented nonce` (string, required)
-        + expiration: `Rcpiration of authorization` (string, required)
+        + expiration: `Expiration of authorization` (string, required)
         
 
       
 
 # Group Exchange
 
-Excanges use MAP to get Claims for specified Investors.
+Exchanges use MAP to get Claims for specified Investors.
 
 ### Get Investor Claim [GET /claims/{pubKey}:{uid}]
 
-Retreive Certificate Claim for Investor.
+Retrieve Certificate Claim for Investor.
 
 + Request (application/json)
     + Attributes
@@ -711,7 +711,7 @@ Retreive Certificate Claim for Investor.
 ## Token issuer (object)
 
 + name: `The token issuer name` (string, required)
-+ publicKey: `The public key of token issuer.` (string, optional)
++ publicKey: `The public key of the token issuer.` (string, optional)
 
 
 ## Asset (object)
@@ -719,7 +719,7 @@ Retreive Certificate Claim for Investor.
 + uid: `The asset uid` (string, required)
 + name: `The user-provided arbitrary name of the asset` (string, required)
 + description: `The user-provided arbitrary description of the asset` (string, required)
-+ dna: `The Token Fundamentals` (Dna, required)
++ fundamentals: `The Token Fundamentals` (fundamentals, required)
 
 
 ## Qualification provider (object)
@@ -734,7 +734,7 @@ Retreive Certificate Claim for Investor.
 + description: `Holds specific details of this qualification.` (string, required)
 + constraints: `Additional constrainst that may apply to the certificate.` (optional)
 
-## Dna (object)
+## fundamentals (object)
 
 + hash: `sha256 hash of document data.` (string, required)
 + url: `location of documents.` (string, required)
