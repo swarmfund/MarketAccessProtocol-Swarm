@@ -6,7 +6,7 @@ Market Access Protocol (MAP) solves existing inefficiencies and difficulties enc
 
 Until now, there has been no ‘one’ globally compliant protocol to provide a framework on which the industry can build to integrate and transfer security tokens in a uniform way. This is because each centralized, for-profit entity is incentivized to do what is best for themselves, not to think about interoperability or broader access beyond their scope. To that end, MAP is an open source infrastructure, designed to be the industry standard protocol empowering the entire security token market.
 
-Swarm's Market Access Protocol allows:
+Market Access Protocol allows:
 
 - Qualification Providers
 - Token Issuers
@@ -125,14 +125,14 @@ Whenever authentication is needed, these HTTP headers are required:
 
 # Getting started
 
-## Qualification provider
+## Qualification Provider
 
 The role of a qualification provider is to issue certificates representing verification checks against any information about a subject. In the context of MAP, certificates usually verify the authenticity or truth of some data about an investor.
 
 **Steps to register as a qualification provider:**
 
 1. [Register](#reference/qualification-provider/account/register)
-2. [Get Qualification Provider](#reference/qualification-provider/api-calls/get-qualification-provider)
+2. [Get qualification provider](#reference/qualification-provider/api-calls/get-qualification-provider)
 2. [Certificate registration](#reference/qualification-provider/certificates/create-certificate)
 3. [List of all certificates](#reference/qualification-provider/certificates/get-certificate-list)
 4. [Get certificate](#reference/qualification-provider/certificates/get-certificate-by-uid)
@@ -141,7 +141,7 @@ The role of a qualification provider is to issue certificates representing verif
 
 <!--![Qualification Provider Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Qualification-provider-light.svg)-->
 
-## Token issuer
+## Token Issuer
 
 The token issuer is the user which registers an asset on the MAP blockchain.
 
@@ -169,9 +169,9 @@ Investors may require to hold certain certificates pertaining to the token they 
 
 For using the SDK and MAP API please consult the [MAP API Docs](/docs/api).
 
-## MAP Blockchain
+## MAP blockchain
 
-MAP is a registry of Tokens, Qualification Providers, Certificates and Associations. It is architected as a decentralized network of nodes with a foundational blockchain layer. This permits:
+MAP is a registry of tokens, qualification providers, certificates and associations. It is architected as a decentralized network of nodes with a foundational blockchain layer. This permits:
 - an open market for compliance;
 - a fully auditable trail of compliance transactions;
 - permissionless integration and participation;
@@ -182,7 +182,9 @@ Privacy of personal investor information is preserved by decoupling the process 
 
 All actions triggered via the API are in fact blockchain transactions and are associated with each address (e.g. Token Issuer's).
 
-The MAP blockchain is an immutable store of records that has two basic types of transactions, Qualification and Association.
+The MAP blockchain is an immutable store of records that has two basic types of transactions:
+1. Qualification - The action of issuing a certificate to a requester
+2. Association. - The action of connecting a certificate with a wallet
 
 
 ## Transfer Restriction rules
