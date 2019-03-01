@@ -2,6 +2,9 @@ FORMAT: 1A
 
 # Market Access Protocol
 
+Market Access Protocol (MAP) solves existing inefficiencies and difficulties encountered by token issuers, investors, exchanges, and qualification providers. 
+
+Until now, there has been no ‘one’ globally compliant protocol to provide a framework on which the industry can build to integrate and transfer security tokens in a uniform way. This is because each centralized, for-profit entity is incentivized to do what is best for themselves, not to think about interoperability or broader access beyond their scope. To that end, MAP is an open source infrastructure, designed to be the industry standard protocol empowering the entire security token market.
 
 Swarm's Market Access Protocol allows:
 
@@ -124,7 +127,7 @@ Whenever authentication is needed, these HTTP headers are required:
 
 ## Qualification provider
 
-The qualification provider is a user which is able to provide KYC-like compliance checks and thus is vital in the process of qualifying investors to interact with a certain digital asset.
+The role of a qualification provider is to issue certificates representing verification checks against any information about a subject. In the context of MAP, certificates usually verify the authenticity or truth of some data about an investor.
 
 **Steps to register as a qualification provider:**
 
@@ -154,8 +157,7 @@ The token issuer is the user which registers an asset on the MAP blockchain.
 
 ## Investor
 
-The Investor is a person or an entity that wishes to buy tokens issued by the Token Issuer. 
-Before the Investor can buy the tokens, or in other words *invest*, a Qualification Provider must verify that the Investor is compliant to invest in the token, according to the requirements and rules specified by the Token Issuer.
+Investors may require to hold certain certificates pertaining to the token they wish to buy, verifying the authenticity of some necessary data or that they meet certain criteria. These certificates are specified by the Token Issuer in order to comply with their specific regulatory requirements.
 
 1. [Send wallet connection request](#reference/investor/send-wallet-connection-request/send-wallet-connection-request)
 2. [GET Authorization signature](#reference/investor/get-authorization-signature/get-authorization-signature)
@@ -169,16 +171,24 @@ For using the SDK and MAP API please consult the [MAP API Docs](/docs/api).
 
 ## MAP Blockchain
 
-MAP keeps track of Assets, Qualification Providers, Qualifications and Associations. To ensure this information remains private and secure, MAP will be built as a decentralized network of nodes having a blockchain as the fundamental layer. 
+MAP is a registry of Tokens, Qualification Providers, Certificates and Associations. It is architected as a decentralized network of nodes with a foundational blockchain layer. This permits:
+- an open market for compliance;
+- a fully auditable trail of compliance transactions;
+- permissionless integration and participation;
+- reusability of qualifications;
+- accountability through cryptographic proofs.
+
+Privacy of personal investor information is preserved by decoupling the process of *requesting certificates* from the process of *associating* a wallet with a certificate.
+
 All actions triggered via the API are in fact blockchain transactions and are associated with each address (e.g. Token Issuer's).
 
-The Swarm MAP blockchain is an immutable store of records that has two basic types of transactions, Qualification and Association.
+The MAP blockchain is an immutable store of records that has two basic types of transactions, Qualification and Association.
 
 
 ## Transfer Restriction rules
 
 
-The Transfer Restriction rule section of the Token Fundamentals document describes the rules that every transfer has to abide by, to be permitted to transact. Since rules can include properties that are only known by the token contract itself at the time of transfer, they are defined in two groups:
+Transfer restrictions and rules are written by the token issuer into a document called Token Fundamentals which is referenced in the original token contract. Restrictions and rules are required to be checked in the process of approving a transfer. Since rules can include properties that are only known by the token contract itself at the time of transfer, they are defined in two groups:
 1. rules to be checked natively on-chain where the Token contract is deployed
 2. rules to be checked outside the native chain by MAP nodes.
 
@@ -262,11 +272,11 @@ transferRules: {
 }
 ```
 
-### MAP transfer restriction rules
+### Properties of transfer
 
-MAP transfer restriction definition section of transfer rules has the following properties:
+Transfer rules have the following properties:
 
-1. `type`: defines the type of rules listed in the rules property, allowing a token issuer to choose how rules are going to be defined, using different implementations to check them. For example, “cert-list” type will just list all certification types wallets needs to have for a simple rule engine to check, but “swarm-rules” can include a much more complex set of rules.
+1. `type`: an identifier for the types of rules stated in the *rules* property, allowing for various implementations on how to check them. For example, “type: cert-list” would list all certification types that a wallet requires to be checked by a simple rule-engine. “Type: transfer-rules” could include a much more complex set of rules.
 2. `version`: maybe not needed as type can handle versioning issues.
 3. `description`: URL of a document describing token transfer rules to investors. 
 4. `rules`: JSON document with a definition of rules for the specific type.
@@ -368,7 +378,12 @@ Retrieve Qualification Provider object.
     
 ## Certificates [/certificates]
 
-Certificate is a verification about some identity that can be issued by a Qualification Provider. 
+A certificate is a cryptographically proven verification of the authenticity or truth of some data that is issued by anyone taking the role of a qualification provider.
+
+Examples of a certificate may be:
+- Proof of Identity
+- Proof of Residence
+- Sanctions List Clearance
 
 ### Create Certificate [POST /qualification-providers/{pubKey}/certificates]
 
