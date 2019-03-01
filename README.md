@@ -6,8 +6,8 @@ Until now, there has been no ‘one’ globally compliant protocol to provide a 
 
 Market Access Protocol allows:
 
-- Qualification Providers
-- Token Issuers
+- Qualification providers
+- Token issuers
 - Investors
 - Wallets
 - Exchanges
