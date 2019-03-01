@@ -1,5 +1,3 @@
-FORMAT: 1A
-
 # Market Access Protocol
 
 Market Access Protocol (MAP) solves existing inefficiencies and difficulties encountered by token issuers, investors, exchanges, and qualification providers. 
