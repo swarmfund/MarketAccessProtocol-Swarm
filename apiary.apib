@@ -144,7 +144,8 @@ The role of a qualification provider is to issue certificates representing verif
 
 ## Token Issuer
 
-The role of a token issuer on the MAP blockchain relates to the registration of assets (tokens).
+The role of a token issuer on the MAP blockchain relates to the registration of assets (tokens) and proving associators
+for those assets.
 
 1. [Register](#reference/token-issuer/api-calls/register)
 2. [Get token issuer](#reference/token-issuer/api-calls/get-token-issuer)
@@ -156,7 +157,7 @@ The role of a token issuer on the MAP blockchain relates to the registration of 
 
 ## Associator
 
-The role of a associator on the MAP blockchain relates reissuance of certificates for Investor's
+The role of a associator on the MAP blockchain relates to reissuance of certificates for Investor's
 wallets.
 
 1. [List of wallet connection requests](#reference/associator/api-calls/list-of-wallet-connection-requests)
@@ -254,20 +255,18 @@ Properties taken from a transfer request.
 2. From
 3. To
 4. Value
-
+5. Nonce
 
 ####Transfer context `(<ctx> prefix)`
 
 Delivered to MAP nodes accepting authorization request.
-1. Nonce
-2. Expiration
-3. IP
-4. Timestamp
-5. GEOIP
+1. IP
+2. Timestamp
+3. GEOIP
 
 #### MAP properties `(<map> prefix)`
 
-Properties MAP holds about objects such as wallets, assets, token issuers, qualification providers, etc.
+Properties MAP holds about objects such as wallets, assets, certificates, token issuers, qualification providers, etc.
 
 ### Transfer restriction rules
 
@@ -336,7 +335,7 @@ Example of a token fundamentals document follows:
         ...
     },
     "transferRules": {
-        contract: {
+        "contract": {
             "address": "0x..."
         },
         "map": {
@@ -350,8 +349,6 @@ Example of a token fundamentals document follows:
     }
 }
 ```
-
-
 
 
 # Group Qualification Provider
@@ -387,7 +384,7 @@ Registers a new qualification provider.
     + Attributes
 
         + name: `The user-provided arbitrary name of the qualification provider.` (required)
-        + publicKey: `public key (ie. ED25519) qualification provider will use to sign objects.` (required)
+        + publicKey: `public key qualification provider will use to sign objects.` (required)
 
 + Response 201 (application/json)
 
@@ -409,15 +406,15 @@ Retrieve qualification provider object.
     
 ## Claims [/claims]
 
-A certificate is a cryptographically proven verification of the authenticity or truth of some data (claim)
-that is issued by anyone taking the role of a qualification provider or associator.
+As verified claims are certificates, claims can be viewed as types of certificates that qualification providers can
+issue.
 
 Examples of a claims may be:
 - Proof of identity
 - Proof of residence
 - Sanctions list clearance
 
-### Create claim [POST /qualification-providers/{pubKey}/claims]
+### Register claim [POST /qualification-providers/{pubKey}/claims]
 
 Register a claims available from a qualification provider on MAP.
 
@@ -430,8 +427,8 @@ Register a claims available from a qualification provider on MAP.
     + Body
     
             {
-                description: "Description of claim",
-                constraints: {
+                "description": "Description of claim",
+                "constraints": {
                     ...
                 }
             }
@@ -446,7 +443,7 @@ Register a claims available from a qualification provider on MAP.
     + Attributes (Certificate)
     
 
-### List claims [GET /qualification-providers/{pubKey}/claims/]
+### List claims [GET /qualification-providers/{pubKey}/claims]
 
 List claims available from a qualification provider.
 
@@ -457,7 +454,7 @@ List claims available from a qualification provider.
     + Attributes (array[Certificate])
     
 
-### Get claim by UID [GET /qualification-providers/{pubKey}/claims/{uid}]
+### Get claim [GET /qualification-providers/{pubKey}/claims/{uid}]
 
 Get details about a specific claim.
 
@@ -471,13 +468,16 @@ Get details about a specific claim.
 ### Delete claim [DELETE /qualification-providers/{pubKey}/claims/{uid}]
 
 Deregister a claim. Future certificate registrations with this claim are not possible,
-but issued certificates using this claim remain valid until specific invalidation.
+but issued certificates using this claim remain valid until specific expiration.
 
 + Request (application/json)
 
 + Response 200
 
 ## Certificates [/certificates]
+
+A certificate is a cryptographically proven verification of the authenticity or truth of some 
+data (claim) that is issued by anyone taking the role of a qualification provider.
 
 ### Register certificate about investor [POST /qualification-providers/{pubKey}/certificates]
 
@@ -491,10 +491,10 @@ Register issuance of certificate for specific investor and claim.
     + Body
     
             {
-                issuer: "",
-                expiration: "",
-                investor: "",
-                claim: ""
+                "issuer": "",
+                "investor": "",
+                "claim": "",
+                "expiration": ""
             }
             
     + Attributes
@@ -518,8 +518,8 @@ Register issuance of certificate for specific investor and claim.
 # Group Token Issuer
 
 Token issuers are entities who control token operations. In the context of MAP, they are primarily 
-responsible for token and associator registration. Token issuers need to register themselves on 
-MAP in order that other parties may authenticate their actions. 
+responsible for token registration and registering associators for tokens. Token issuers need to 
+register themselves on MAP so that other parties may verify their actions. 
 
 ## API calls [/token-issuers]
 
@@ -648,14 +648,12 @@ information, handling registration tasks and saving connection information off-s
 List wallet connection requests.
 
 + Request
-
     + Parameters
-    
-        + status: `type of status` (string, optional)
+        + status: `status of wallet connection request` (string, optional)
 
 + Response 200 (application/json)
-
-    + Attributes (array[string])
+    + Attributes 
+        +requests: `array of wallet connection request objects uids` (array[string])
     
     
 ### Get wallet connection request [GET /associator/{pubKey}/requests/{uid}]
@@ -663,7 +661,6 @@ List wallet connection requests.
 Retrieve specific wallet connection request.
 
 + Response 200 (application/json)
-
     + Attributes
         + request: `Encrypted investor request.` (string, required)
 
@@ -696,22 +693,26 @@ Protection of investor privacy is accomplished by separating the wallet and inve
 connection information off-MAP in the token issuer's or associator records. The wallet registration flow facilitates this
 separation:
 
-1. An investor sends a wallet registration request for a selected asset to MAP, encrypting the whole request object in such a manner that only the destination token issuer can read the information about the investor and the connecting Wallet.
+1. An investor sends a wallet registration request for a selected asset to MAP, encrypting the whole request object 
+in such a manner that only the destination token issuer or associator can read the information about the investor
+and the connecting Wallet.
 
-2. The token issuer handles the request by recording investor-wallet connections for possible future regulatory queries, reissuing investor certificates with the same claims and properties, and connecting a new wallet's public key.
+2. The token issuer handles the request by recording investor-wallet connections for possible future regulatory 
+queries, reissuing investor certificates with the same claims and properties, and connecting a new wallet's 
+public key.
 
-
-Any entity wishing to check a wallet's certificates for a particular token can use certificates about that wallet, extending trust from Qualification Provider to the Issuer of the particular token.
+Any entity wishing to check a wallet's certificates for a particular token can use certificates about that wallet,
+extending trust from Qualification Provider to the Issuer of or Associator for the particular token.
 
 ### Send wallet connection request [POST /associator/{pubKey}/requests]
 
-Send register wallet request with asset to associator. Encrypted request data object consists of:
+Send wallet connection request for specified asset to associator. Encrypted request data object consists of:
 
 1. Investor public key
 2. Details of wallet (blockchain, address)
-3. Investor signature
-4. Wallet signature
-5. Investor certificates ids
+3. Array of Investor's certificates for reissuance by associator
+4. Investor's signature of the request data
+5. Wallet's signature of the request data
 
 Request data object is encrypted with the designated asset's token issuer key.
 
@@ -735,19 +736,22 @@ Request data object is encrypted with the designated asset's token issuer key.
 ### Get authorization signature [GET /authorizations]
 
 An Authorization signature must be obtained for transfer rules which require checks made by MAP. 
-This authorization needs to be obtained before the transfer method is called in the token contract and is given after all rules are checked by MAP nodes.
+This authorization needs to be obtained before the transfer method is called in the token contract 
+and is given after all rules are checked by MAP nodes.
 
-Authorization returned needs to carry a relatively short expiration time, to prevent a user from using it too far into the future.
+Authorization returned needs to carry a relatively short expiration time, to prevent a user from 
+using it too far into the future.
 
 
 + Request (application/json)
 
     + Body
         {
-            asset: "",
-            from: "",
-            to: "",
-            value: ""
+            "asset": "",
+            "from": "",
+            "to": "",
+            "value": "",
+            "nonce": 0
         }
         
     + Attributes
@@ -755,6 +759,7 @@ Authorization returned needs to carry a relatively short expiration time, to pre
         + from: `Asset's wallet` (string, required)
         + to: `Asset's wallet` (string, required)
         + value: `Transfer value` (string, required)
+        + nonce: `Token nonce from asset contract` (number, required)
 
 + Response 200
     + Attributes
@@ -762,10 +767,9 @@ Authorization returned needs to carry a relatively short expiration time, to pre
         + from: `Asset's wallet` (string, required)
         + to: `Asset's wallet` (string, required)
         + value: `Transfer value` (string, required)
-        + authorization: `signed authorization data <asset/from/to/value/nonce/expiration>` (string, required)
-        + nonce: `Incremented nonce` (string, required)
+        + nonce: `Token nonce` (number, required)
         + expiration: `Expiration of authorization` (string, required)
-        
+        + authorization: `object describing signed authorization data <asset/from/to/value/nonce/expiration>` (object, required)
 
       
 
