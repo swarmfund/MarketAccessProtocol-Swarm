@@ -2,15 +2,24 @@ FORMAT: 1A
 
 # Market Access Protocol
 
-Market Access Protocol (MAP) solves existing inefficiencies and difficulties encountered by token issuers, investors, exchanges, and qualification providers. 
+Market Access Protocol (MAP) is Swarm’s investor compliance ecosystem, built and maintained by a decentralized network of nodes.
+MAP solves existing inefficiencies and difficulties encountered by token issuers, investors, exchanges, and certificate issuers. 
+
+
+It is a protocol that allows applications (blockchain or non-blockchain) to interact with users in a regulatory compliant manner, and results in a distributed ledger that stores investor qualification data, respecting user privacy. All personal identifiable information that is processed by MAP participants remains the property of the owner, and can only be revealed with the owner’s authority.
+
+MAP provides liquidity for digital securities markets by leveraging investor qualifications through inheritance and network effects.
+
+Investor qualifications are inherited from a single master identity to multiple wallets on any blockchain or application that supports the protocol, obfuscating the investor’s activity. Liquidity is further improved as network effects develop from the increased pool of qualified investors and use of the compliance infrastructure.
+
+MAP enables the flow of compliant securities transactions to be processed by defining how market access data is stored, read, written and audited in accordance with its protocol. MAP takes care of investor compliance so that token issuers can focus on their core function of managing the assets and conveying their investment’s value proposition.
 
 Until now, there has been no ‘one’ globally compliant protocol to provide a framework on which the industry can build to integrate and transfer security tokens in a uniform way. This is because each centralized, for-profit entity is incentivized to do what is best for themselves, not to think about interoperability or broader access beyond their scope. To that end, MAP is an open source infrastructure, designed to be the industry standard protocol empowering the entire security token market.
 
 Market Access Protocol allows:
 
-- Qualification providers
+- Certificate issuers
 - Token issuers
-- Associator
 - Investors
 - Wallets
 - Exchanges
@@ -48,7 +57,7 @@ Relationships are created between resources using the PUT action. The exact reso
 
 ---
 
-`DELETE /qualification-providers/<pub>/certs/<uid>`
+`DELETE /certificate-issuers/<pub>/certs/<uid>`
 
 
 ## Response structure
@@ -93,7 +102,7 @@ Standard errors are:
 
 **429**: Too many requests, slow down and try again later
 
-**422**: Unprocessable Entity due to payload being too large in size.
+**422**: Unprocessable entity due to payload being too large in size.
 
 **500**: Resource action failed due to internal error
 
@@ -126,39 +135,66 @@ Whenever authentication is needed, these HTTP headers are required:
 
 # Getting started
 
-## Qualification Provider
+## Claims and Certificates
 
-The role of a qualification provider is to issue certificates representing verification checks against any information about a subject. In the context of MAP, certificates usually verify the authenticity or truth of some data about an investor.
+MAP uses a system of claims and certificates to prove that an investor is regulatory compliant or qualified to trade an asset subject to securities regulations in any jurisdiction.
 
-**Steps to register as a qualification provider:**
+A *claim* is any statement made by an investor that requires verification. For example, an investor may make the following claims:
+* I am over 18 years old
+* I am a resident of the United States
+* I am an accredited investor
+* I am not on a sanctions or politically-exposed persons list.
 
-1. [Register](#reference/qualification-provider/account/register)
-2. [Get qualification provider](#reference/qualification-provider/api-calls/get-qualification-provider)
-2. [Claim registration](#reference/qualification-provider/certificates/create-certificate)
-3. [List of all claims](#reference/qualification-provider/certificates/get-certificate-list)
-4. [Get claim](#reference/qualification-provider/certificates/get-certificate-by-uid)
-5. [Delete claim](#reference/qualification-provider/certificates/delete-certificate)
-5. [Register certificate about investor](#reference/qualification-provider/claims/register-claim-about-investor)
 
-<!--![Qualification Provider Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Qualification-provider-light.svg)-->
+A *certificate* is a document that contains proof that a certain claim has been verified.
+It can be thought of as a *verified claim*.
+Certificates are associated with investors’ wallets after processing or verifying the data stated in a claim.
+Certificates on MAP do not contain any personal information.
+For example, a certificate may prove that a wallet belongs to an investor who is :
+* over 18 years old
+* a resident of the United States
+* an accredited investor
+* not on a sanctions or politically-exposed persons list
 
-## Token Issuer
+Certificates prove the authenticity or truth of a claim by an investor without revealing the underlying data.
 
-The role of a token issuer on the MAP blockchain relates to the registration of assets (tokens) and proving associators
+Privacy is maintained by decoupling the operation of issuing a certificate - requiring an investor to submit personal information - from the operation of associating a wallet with a certificate - which reveals no personal information. The link between wallet and identity can only be established with the investor's authorization.
+
+
+## Certificate issuer
+
+The role of a certificate issuer is to issue certificates representing verification checks against any claims made by a subject. In the context of MAP, certificates usually verify the authenticity or truth of some data about an investor.
+
+**Steps to register as a certificate issuer:**
+
+1. [Register](#reference/certificate-issuer/account/register)
+2. [Get certificate issuer](#reference/certificate-issuer/api-calls/get-certificate-issuer)
+2. [Certificate registration](#reference/certificate-issuer/certificates/create-certificate)
+3. [List of all certificates](#reference/certificate-issuer/certificates/get-certificate-list)
+4. [Get certificate](#reference/certificate-issuer/certificates/get-certificate-by-uid)
+5. [Delete certificate](#reference/certificate-issuer/certificates/delete-certificate)
+5. [Register user certificate](#reference/certificate-issuer/certificates/register-user-certificate)
+
+<!--![certificate issuer Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/certificate-issuer-light.svg)-->
+
+## Token issuer
+
+The role of a token issuer on the MAP blockchain relates to the registration of assets (tokens) and associators
 for those assets.
 
 1. [Register](#reference/token-issuer/api-calls/register)
 2. [Get token issuer](#reference/token-issuer/api-calls/get-token-issuer)
-3. [Register a new asset](#reference/token-issuer/api-calls/register-asset)
-4. [Register a associator](#reference/token-issuer/api-calls/register-associator)
-5. [Update Token Fundamentals](#reference/token-issuer/api-calls/update-token-fundamentals)
+3. [Register new asset](#reference/token-issuer/api-calls/register-asset)
+4. [Register associator](#reference/token-issuer/api-calls/register-associator)
+5. [Update KYA](#reference/token-issuer/api-calls/update-token-kya)
 
     <!--![Token Issuer Flow](http://swarm-map-public-images.s3-website.us-east-2.amazonaws.com/Token-issuer-light.svg)-->
 
 ## Associator
 
-The role of a associator on the MAP blockchain relates to reissuance of certificates for Investor's
-wallets.
+Associators enable investors to inherit qualifications from their master wallet to any other associated wallets.
+Associators reissue previously obtained certificates to other wallets that are cryptographically proven to belong to a single identity.
+Other than maintaining investor privacy, this process allows for the reusability of qualifications.
 
 1. [List of wallet connection requests](#reference/associator/api-calls/list-of-wallet-connection-requests)
 2. [Get wallet connection request](#reference/associator/api-calls/get-wallet-connection-request)
@@ -183,7 +219,7 @@ For using the SDK and MAP API please consult the [MAP API Docs](/docs/api).
 
 ## MAP blockchain
 
-MAP is a registry of tokens, qualification providers, claims, certificates and associations. It is architected as a decentralized network of nodes with a foundational blockchain layer. This permits:
+MAP is a registry of tokens, certificate issuers, claims, certificates and associations. It is architected as a decentralized network of nodes with a foundational blockchain layer. This permits:
 - an open market for compliance;
 - a fully auditable trail of compliance transactions;
 - permissionless integration and participation;
@@ -200,20 +236,25 @@ The link between wallet and identity can only be established with the investor's
 All actions triggered via the API are in fact blockchain transactions and are associated with each address (e.g. Token Issuer's).
 
 The MAP blockchain is an immutable store of records that has two basic types of transactions:
-1. Qualification - The action of issuing a certificate to a requester
+1. Issuance - The action of granting a certificate to a requester
 2. Association - The action of associating a certificate with a wallet
+
+#### MAP properties `(<map> prefix)`
+
+Properties MAP holds about objects such as wallets, assets, certificates, token issuers, certificate issuers, etc.
 
 
 ## Transfer restriction rules
 
+Digital securities are subject to certain ownership and trading restrictions set by government authorities and regulators.
+MAP allows token issuers to configure the restrictions that apply to their digital securities, and assures regulatory compliance by enforcing and checking restrictions with every attempt to make a transfer.
 
-Transfer restrictions and rules are written by the token issuer into *token fundamentals*, a file
-that is referenced in the original token contract.
-Restrictions and rules are required to be checked in the process of approving a transfer.
-Since rules can reference properties that require knowing the current state of the ledger,
-they are defined in two groups:
-1. rules to be checked natively on-chain where the token contract is deployed
-2. rules to be checked outside the native chain by MAP nodes.
+Transfer restrictions and rules are written by the token issuer into KYA - “Know Your Asset”, a file that is referenced in the original token contract.
+
+Some rules reference properties that depend on the current state of the ledger, while other rules require checking a wallet for specific certificates.
+This is handled by dividing transfer restrictions into two groups:
+* rules to be checked natively on-chain where the token contract is deployed
+* rules to be checked outside the native chain by MAP nodes.
 
 
 ### Transfer authorization flow
@@ -222,7 +263,7 @@ Transfer rules that are checked on-chain query the token contract.
 The transfer method implementation should account for additional checks to be performed on-chain
 before allowing a transfer to be executed.
 
-Transfer rules that require checks outside of the original chain are written in *token fundamentals* and are performed by MAP nodes.
+Transfer rules that require checks outside of the original chain are written in *KYA* and are performed by MAP nodes.
 A successful transfer requires an authorization signature from a MAP node with proof that all checks have been performed.
 An example token contract should have the transfer method with at least the following signature:
 
@@ -232,16 +273,15 @@ transfer(address _to, uint256 _value, uint256 _nonce, uint256 _expiration, bytes
 
 where msgHash consists of `(asset, from, to, data, nonce, expiration)` values. The **nonce** is used to prevent replay attacks while **expiration** represents the authorization's validity period. 
 
-
 Transfers that require MAP authorization contain the following properties,
-which are defined by the rules declaratively stated in token fundamentals. 
+which are defined by the rules declaratively stated in KYA. 
 1. Asset
 2. Transfer
 3. Transfer context
 
 ####Asset properties `(<token> prefix)`
 
-Stable properties acquired from token fundamentals or the token contract.
+Stable properties acquired from KYA or the token contract.
 1. Creation time
 2. Supply
 3. Decimals
@@ -257,28 +297,24 @@ Properties taken from a transfer request.
 4. Value
 5. Nonce
 
-####Transfer context `(<ctx> prefix)`
+####Transfer context properties `(<ctx> prefix)`
 
 Delivered to MAP nodes accepting authorization request.
 1. IP
 2. Timestamp
 3. GEOIP
 
-#### MAP properties `(<map> prefix)`
-
-Properties MAP holds about objects such as wallets, assets, certificates, token issuers, qualification providers, etc.
-
 ### Transfer restriction rules
 
-As stated earlier, two sets of transfer restriction rules are defined in token fundamentals:
+As stated earlier, two sets of transfer restriction rules are defined in KYA:
 
 1. Native Rules: Rules enforced natively on-chain where the token contract is deployed
 2. MAP Rules: Rules enforced by MAP which are impossible or economically unfeasible to be performed natively on-chain
 
 Native rules are defined by a single address of the contract enforcing the rules. 
-MAP rules are stipulated in token fundamentals. 
+MAP rules are stipulated in KYA. 
 
-Example of the rules section of token fundamentals:
+Example of the rules section of KYA:
 
 ```
 "transferRules": {
@@ -302,22 +338,22 @@ Transfer rules have the following properties:
 
 1. `type`: an identifier for the types of rules stated in the *rules* property,
 allowing for various implementations on how to check them. For example, “type: cert-list” would list all certification types that a wallet requires to be checked by a simple rule-engine. “Type: transfer-rules” could include a much more complex set of rules.
-2. `version`: maybe not needed as type can handle versioning issues.
+2. `version`: may not be needed as type can handle versioning issues.
 3. `description`: URL of a document describing token transfer rules to investors. 
 4. `rules`: JSON document with a definition of rules for the specific type.
 
 MAP nodes need to have an implementation of rule checks for transfer_rules.map.type,
-or transfer restriction authorizations will return an error indicating unknown rule type in Token Fundamentals.
+or transfer restriction authorizations will return an error indicating unknown rule type in KYA.
 
-## Token fundamentals document
+## KYA "Know Your Asset" document
 
-The token fundamentals document has at least the following top level properties:
+The KYA document has at least the following top level properties:
 
 1. `token`: token properties listing which can be used on MAP node.
 2. `properties`: various token properties, like an icon, description, etc.
 3. `transferRules`: properties defining native on-chain and MAP transfer rules.
 
-Example of a token fundamentals document follows:
+Example of a KYA document follows:
 
 ```
 {
@@ -351,22 +387,22 @@ Example of a token fundamentals document follows:
 ```
 
 
-# Group Qualification Provider
+# Group Certificate issuer
 
-Qualification providers are entities that issue various types of trusted certificates.
-A certificate is proof that a qualification provider has verified the authenticity of a claim.
-Qualification providers must register themselves on MAP, update a list of supported claims and the required data a subject must provide in order to obtain a certificate.
+Certificate issuers are entities that issue various types of trusted certificates.
+A certificate is proof that a certificate issuer has verified the authenticity of a claim.
+Certificate issuers must register themselves on MAP, update a list of supported claims and the required data a subject must provide in order to obtain a certificate.
 A typical certificate would be a KYC certificate issued to a prospective investor verifying their claim that they are who they say they are.
 Claims, as certificate types, are identified by a unique id.
 
 Information about the existence of a certificate is registered on MAP, along with the basic data required to check the validity of a registered certificate.
 The certificate is identified by a certificate's unique id and the subject's public key.
 
-## API calls [/qualification-providers]
+## API calls [/certificate-issuers]
 
 ### Register [POST]
 
-Registers a new qualification provider.
+Registers a new certificate issuer.
 
 + Request (application/json)
 
@@ -377,109 +413,44 @@ Registers a new qualification provider.
     + Body
     
             {
-                name: "The user-provided arbitrary name of the qualification provider",
+                name: "The user-provided arbitrary name of the certificate issuer",
                 publicKey: "{publicKey}",
             }
     
     + Attributes
 
-        + name: `The user-provided arbitrary name of the qualification provider.` (required)
-        + publicKey: `public key qualification provider will use to sign objects.` (required)
+        + name: `The user-provided arbitrary name of the certificate issuer.` (required)
+        + publicKey: `public key certificate issuer will use to sign objects.` (required)
 
 + Response 201 (application/json)
 
-    + Attributes (Qualification provider)            
+    + Attributes (certificate issuer)            
 
-## Get qualification provider [GET /qualification-providers/{pubKey}]
+## Get certificate issuer [GET /certificate-issuers/{pubKey}]
 
-Retrieve qualification provider object.
+Retrieve certificate issuer object.
 
 + Request
 
     + Parameters
     
-        + pubKey: public key qualification provider will use to sign objects.
+        + pubKey: public key certificate issuer will use to sign objects.
 
 + Response 200 (application/json)
 
-    + Attributes (Qualification provider)
+    + Attributes (certificate issuer)
     
-## Claims [/claims]
+## Certificates [/certificates]
 
-As verified claims are certificates, claims can be viewed as types of certificates that qualification providers can
-issue.
+A certificate is a cryptographically proven verification of the authenticity or truth of some 
+data (claim) that is issued by anyone taking the role of a certificate issuer.
 
-Examples of a claims may be:
+Examples of a certificate may be:
 - Proof of identity
 - Proof of residence
 - Sanctions list clearance
 
-### Register claim [POST /qualification-providers/{pubKey}/claims]
-
-Register a claims available from a qualification provider on MAP.
-
-+ Request (application/json)
-    
-    + Headers
-
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
-    
-    + Body
-    
-            {
-                "description": "Description of claim",
-                "constraints": {
-                    ...
-                }
-            }
-            
-    + Attributes
-            
-        + description: Holds specific details of this qualification. (required)
-        + constraints: Additional constrainst that may apply to the claim. (optional)
-
-+ Response 201
-
-    + Attributes (Certificate)
-    
-
-### List claims [GET /qualification-providers/{pubKey}/claims]
-
-List claims available from a qualification provider.
-
-+ Request (application/json)
-
-+ Response 200
-
-    + Attributes (array[Certificate])
-    
-
-### Get claim [GET /qualification-providers/{pubKey}/claims/{uid}]
-
-Get details about a specific claim.
-
-+ Request (application/json)
-
-+ Response 200
-
-    + Attributes (Certificate)
-    
-
-### Delete claim [DELETE /qualification-providers/{pubKey}/claims/{uid}]
-
-Deregister a claim. Future certificate registrations with this claim are not possible,
-but issued certificates using this claim remain valid until specific expiration.
-
-+ Request (application/json)
-
-+ Response 200
-
-## Certificates [/certificates]
-
-A certificate is a cryptographically proven verification of the authenticity or truth of some 
-data (claim) that is issued by anyone taking the role of a qualification provider.
-
-### Register certificate about investor [POST /qualification-providers/{pubKey}/certificates]
+### Register user certificate [POST /certificate-issuers/{pubKey}/certificates]
 
 Register issuance of certificate for specific investor and claim.
 
@@ -499,7 +470,7 @@ Register issuance of certificate for specific investor and claim.
             
     + Attributes
             
-        + issuer: Qualification provider public key. (required)
+        + issuer: certificate issuer public key. (required)
         + expiration: Expiration datetime. (required)
         + investor: Investor public key. (required)
         + certificate: Certificate UID. (required)
@@ -509,11 +480,70 @@ Register issuance of certificate for specific investor and claim.
     + Attributes
         
         + uid: Generated claim uid.
-        + issuer: Qualification provider public key.
+        + issuer: certificate issuer public key.
         + expirationDate: Expiration datetime.
         + investor: Investor public key.
         + certificate: Certificate UID.
 
+### Register certificate [POST /certificate-issuers/{pubKey}/certificate]
+
+Register certificates available from a certificate issuer on MAP.
+
++ Request (application/json)
+    
+    + Headers
+
+            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+    
+    + Body
+    
+            {
+                "description": "Description of the certificate",
+                "constraints": {
+                    ...
+                }
+            }
+            
+    + Attributes
+            
+        + description: Holds specific details of this qualification. (required)
+        + constraints: Additional constrainst that may apply to the certificate. (optional)
+
++ Response 201
+
+    + Attributes (Certificate)
+    
+
+### List certificate [GET /certificate-issuers/{pubKey}/certificates]
+
+List certificate available from a certificate issuer.
+
++ Request (application/json)
+
++ Response 200
+
+    + Attributes (array[Certificate])
+    
+
+### Get certificate [GET /certificate-issuers/{pubKey}/certificate/{uid}]
+
+Get details about a specific certificate.
+
++ Request (application/json)
+
++ Response 200
+
+    + Attributes (Certificate)
+    
+
+### Delete certificate [DELETE /certificate-issuers/{pubKey}/certificate/{uid}]
+
+Deregister a certificate. Future certificate registrations of this type are not possible,
+but issued certificates of this type remain valid until specific expiration.
+
++ Request (application/json)
+
++ Response 200
 
 # Group Token Issuer
 
@@ -569,7 +599,7 @@ Adds a new asset to the MAP blockchain.
                 symbol: "",
                 decimals: 0,
                 supply: 0,
-                fundamentals: {
+                kya: {
                     hash: "",
                     url: ""
                 }
@@ -584,7 +614,7 @@ Adds a new asset to the MAP blockchain.
         + decimals: `Token decimals` (number, required)
         + supply: `Initial token supply` (number, required)
         + properties: `Some other fields that will be inserted` (string, optional)
-        + fundamentals: `Asset description document` (Token fundamentals location, required)
+        + kya: `Asset description document` (KYA location, required)
 
 + Response 201 (application/json)
 
@@ -593,7 +623,7 @@ Adds a new asset to the MAP blockchain.
     
 ### Register associator for asset [POST /token-issuers/{pubKey}/assets/{pubKey}/associators/{pubKey}]
 
-Registering associator that can issue certificate for asset wallets.
+Register associator that can issue certificate for asset wallets.
 
 + Request (application/json)
 
@@ -617,9 +647,9 @@ Unregistering associator for asset.
 + Response 200 (application/json)
 
 
-### Update token fundamentals [PUT /token-issuers/{pubKey}/assets/{pubKey}/fundamentals]
+### Update KYA [PUT /token-issuers/{pubKey}/assets/{pubKey}/kya]
 
-Update token fundamentals document properties. 
+Update KYA document properties. 
 
 + Request 
 
@@ -636,9 +666,8 @@ Update token fundamentals document properties.
 
 # Group Associator
 
-Associators are responding to investor wallet registration requests - separating investor wallets 
-from investor certifications. Associators are the only entities in MAP that possess investor-wallet connection 
-information, handling registration tasks and saving connection information off-site.
+Associators respond to certificate-wallet registration requests, creating an association between a certificate and a wallet.
+Associators are the only entities in MAP that possess investor-wallet connection information, handling registration tasks and saving connection information off-site.
 
 ## API calls [/associators]
 
@@ -684,13 +713,13 @@ Update specific wallet connection request. This call is used to reassign identit
 
 # Group Investor
 
-Investors, identified by their MAP public keys, are entities expected to obtain certificates from qualification
-providers. Certificates, stored on MAP, combine to *qualify* an investor's wallets, allowing them to participate in asset trading. 
+Investors, identified by their MAP public keys, are entities expected to obtain certificates from certificate issuers.
+Certificates, stored on MAP, combine to *qualify* investor wallets, allowing them to participate in asset trading. 
 
 
 ## Investor wallet registration
 Protection of investor privacy is accomplished by separating the wallet and investor objects, and keeping their
-connection information off-MAP in the token issuer's or associator records. The wallet registration flow facilitates this
+connection information off-MAP in the token issuer's or associator's records. The wallet registration flow facilitates this
 separation:
 
 1. An investor sends a wallet registration request for a selected asset to MAP, encrypting the whole request object 
@@ -701,8 +730,8 @@ and the connecting Wallet.
 queries, reissuing investor certificates with the same claims and properties, and connecting a new wallet's 
 public key.
 
-Any entity wishing to check a wallet's certificates for a particular token can use certificates about that wallet,
-extending trust from Qualification Provider to the Issuer of or Associator for the particular token.
+Any entity wishing to check a wallet's qualification to trade a particular token can query the wallet's certificates,
+this includes applications, exchanges and even decentralized exchanges.
 
 ### Send wallet connection request [POST /associator/{pubKey}/requests]
 
@@ -735,12 +764,12 @@ Request data object is encrypted with the designated asset's token issuer key.
 
 ### Get authorization signature [GET /authorizations]
 
-An Authorization signature must be obtained for transfer rules which require checks made by MAP. 
+An authorization signature must be obtained for transfer rules which require checks made by MAP. 
 This authorization needs to be obtained before the transfer method is called in the token contract 
 and is given after all rules are checked by MAP nodes.
 
-Authorization returned needs to carry a relatively short expiration time, to prevent a user from 
-using it too far into the future.
+Returned authorizations need to carry a relatively short expiration time, to prevent users from 
+using them too far into the future.
 
 
 + Request (application/json)
@@ -775,7 +804,7 @@ using it too far into the future.
 
 # Group Exchange
 
-Exchanges use MAP to get certificates for specified Investors.
+Exchanges use MAP to get certificates for specified investors.
 
 ### Get investor certificate [GET /certificates/{pubKey}:{uid}]
 
@@ -806,13 +835,13 @@ Retrieve certificate for investor.
 + uid: `The asset uid` (string, required)
 + name: `The user-provided arbitrary name of the asset` (string, required)
 + description: `The user-provided arbitrary description of the asset` (string, required)
-+ fundamentals: `The Token Fundamentals` (Token fundamentals location, required)
++ kya: `The KYA` (KYA location, required)
 
 
-## Qualification provider (object)
+## certificate issuer (object)
 
-+ name: `The user-provided arbitrary name of the qualification provider.` (string, required)
-+ publicKey: `Ed25519 public key qualification provider will use to sign objects.` (string, required)
++ name: `The user-provided arbitrary name of the certificate issuer.` (string, required)
++ publicKey: `Ed25519 public key certificate issuer will use to sign objects.` (string, required)
 
 
 ## Claim (object)
@@ -829,7 +858,7 @@ Retrieve certificate for investor.
 + claim: `UID of certified claim.` (string, required)
 + expiration: `Certificate validity.` (number, optional)
 
-## Token fundamentals location (object)
+## KYA location (object)
 
 + hash: `sha256 hash of document data.` (string, required)
 + url: `location of documents.` (string, required)
@@ -839,4 +868,4 @@ Retrieve certificate for investor.
 
 + name: `The user-provided arbitrary name of the token issuer` (string, required)
 + ipfsMetadata: `The IPFS hash which contains arbitrary user-provided metadata.` (string, optional)
-+ domain: `The fully qualified domain name which will be used for Qualification provider verification purposes.`
++ domain: `The fully qualified domain name which will be used for certificate issuer verification purposes.`
