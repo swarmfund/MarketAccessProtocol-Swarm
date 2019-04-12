@@ -6,7 +6,7 @@ Market Access Protocol (MAP) is Swarm’s investor compliance ecosystem, built a
 MAP solves existing inefficiencies and difficulties encountered by token issuers, investors, exchanges, and certificate issuers. 
 
 
-It is a protocol that allows applications (blockchain or non-blockchain) to interact with users in a regulatory compliant manner, and results in a distributed ledger that stores investor qualification data, respecting user privacy. All personal identifiable information that is processed by MAP participants remains the property of the owner, and can only be revealed with the owner’s authority.
+MAP is a protocol that allows applications (blockchain or non-blockchain) to interact with users in a regulatory compliant manner, and results in a distributed ledger that stores investor qualification data, respecting user privacy. All personal identifiable information that is processed by MAP participants remains the property of the owner, and can only be revealed with the owner’s authority.
 
 MAP provides liquidity for digital securities markets by leveraging investor qualifications through inheritance and network effects.
 
@@ -46,18 +46,18 @@ If the resource already exists, it is returned with a `409 Conflicts` instead of
 
 Resource data is retrieved using the GET action.
 
-        `GET /token-issuers/<pubKey>`
+        `GET /token-issuers/<id>`
         
 --- 
 
 Relationships are created between resources using the PUT action. The exact resource on which the relationship will be attached is implicitly recognized from the successfuly authenticated user.
 
-        `PUT /token-issuer/<pubKey>`
+        `PUT /token-issuer/<id>`
 
 
 ---
 
-`DELETE /certificate-issuers/<pub>/certs/<uid>`
+`DELETE /certificate-issuers/<id>/certs/<uid>`
 
 
 ## Response structure
@@ -199,13 +199,14 @@ Other than maintaining investor privacy, this process allows for the reusability
 1. [List of wallet connection requests](#reference/associator/api-calls/list-of-wallet-connection-requests)
 2. [Get wallet connection request](#reference/associator/api-calls/get-wallet-connection-request)
 3. [Update wallet connection request](#reference/associator/api-calls/update-wallet-connection-request)
+4. [Reissue certificates](#reference/associator/api-calls/reissue-certificates)
 
 
 ## Investor
 
-The role of an investor is to obtain the certificates required by a token issuer to trade in a specific asset.
-Investors acquire certificates by verifying the authenticity of some claim.
-Certificates are stipulated by the token issuer in order to comply with a token's specific regulatory requirements.
+The role of an investor is to obtain the certificates required to compliantly trade in a specific asset.
+Certificates are stipulated by the token's issuer.
+Investors acquire certificates by asking a certificate issuer to verify the authenticity of some claim.
 
 1. [Send wallet connection request](#reference/investor/send-wallet-connection-request/send-wallet-connection-request)
 2. [GET Authorization signature](#reference/investor/get-authorization-signature/get-authorization-signature)
@@ -407,8 +408,9 @@ Registers a new certificate issuer.
 + Request (application/json)
 
     + Headers
-        
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
@@ -420,21 +422,23 @@ Registers a new certificate issuer.
     + Attributes
 
         + name: `The user-provided arbitrary name of the certificate issuer.` (required)
-        + publicKey: `public key certificate issuer will use to sign objects.` (required)
+        + publicKey: `ECDSA public(secp256k1) key that certificate issuer will use to sign objects.` (required)
 
 + Response 201 (application/json)
 
     + Attributes (certificate issuer)            
 
-## Get certificate issuer [GET /certificate-issuers/{pubKey}]
+## Get certificate issuer [GET /certificate-issuers/{id}]
 
 Retrieve certificate issuer object.
 
 + Request
+    + Headers
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
 
     + Parameters
     
-        + pubKey: public key certificate issuer will use to sign objects.
+        +id: MAP id(unique identifier of the token issuer).
 
 + Response 200 (application/json)
 
@@ -450,56 +454,56 @@ Examples of a certificate may be:
 - Proof of residence
 - Sanctions list clearance
 
-### Register user certificate [POST /certificate-issuers/{pubKey}/certificates]
+### Register user certificate [POST /certificate-issuers/{id}/certificates]
 
 Register issuance of certificate for specific investor and claim.
 
 + Request (application/json)
     + Headers
-
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
             {
                 "issuer": "",
                 "investor": "",
-                "claim": "",
+                "type": "",
                 "expiration": ""
             }
             
     + Attributes
             
-        + issuer: certificate issuer public key. (required)
-        + expiration: Expiration datetime. (required)
-        + investor: Investor public key. (required)
-        + certificate: Certificate UID. (required)
+        + issuer: Certificate issuer MAP id. (required)
+        + expiration: Expiration UTC timestamp. (required)
+        + investor: Investors MAP id. (required)
+        + certificate: Certificate type UID. (required)
 
 + Response 201
 
     + Attributes
         
-        + uid: Generated claim uid.
-        + issuer: certificate issuer public key.
-        + expirationDate: Expiration datetime.
-        + investor: Investor public key.
+        + uid: Generated certificate uid.
+        + issuer: Certificate issuer MAP id.
+        + expiration: Expiration UTC timestamp.
+        + investor: Investors MAP id.
         + certificate: Certificate UID.
 
-### Register certificate [POST /certificate-issuers/{pubKey}/certificate]
+### Register certificate [POST /certificate-issuers/{id}/certificate]
 
 Register certificates available from a certificate issuer on MAP.
 
 + Request (application/json)
     
     + Headers
-
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
             {
                 "description": "Description of the certificate",
-                "constraints": {
+                "constraints":{
                     ...
                 }
             }
@@ -514,34 +518,41 @@ Register certificates available from a certificate issuer on MAP.
     + Attributes (Certificate)
     
 
-### List certificate [GET /certificate-issuers/{pubKey}/certificates]
+### List certificates [GET /certificate-issuers/{id}/certificates]
 
-List certificate available from a certificate issuer.
+List certificates available from a specific certificate issuer.
 
 + Request (application/json)
+    + Headers
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
 
 + Response 200
 
-    + Attributes (array[Certificate])
+    + Attributes (array[Certificate type])
     
 
-### Get certificate [GET /certificate-issuers/{pubKey}/certificate/{uid}]
+### Get certificate [GET /certificate-issuers/{id}/certificate/{uid}]
 
 Get details about a specific certificate.
 
 + Request (application/json)
+    + Headers
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
 
 + Response 200
 
     + Attributes (Certificate)
     
 
-### Delete certificate [DELETE /certificate-issuers/{pubKey}/certificate/{uid}]
+### Delete certificate [DELETE /certificate-issuers/{id}/certificate/{uid}]
 
-Deregister a certificate. Future certificate registrations of this type are not possible,
+Deregister a certificate. After deregistration, future certificate registrations of this type are not possible,
 but issued certificates of this type remain valid until specific expiration.
 
 + Request (application/json)
+    + Headers
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
 
 + Response 200
 
@@ -560,8 +571,8 @@ Registers the token issuer.
 + Request (application/json)
 
     + Headers
-        
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Attributes
     
@@ -572,23 +583,29 @@ Registers the token issuer.
 
     + Attributes (Token issuer)
     
-### Get token issuer [GET /token-issuers/{pubKey}]
+
+### Get token issuer [GET /token-issuers/{id}]
 
 Get information about a token issuer.
++ Request (application/json)
+
+    + Headers
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
 
 + Response 200 (application/json)
 
     + Attributes (Token issuer)
     
-### Register asset [POST /token-issuers/{pubKey}/assets]
+
+### Register asset [POST /token-issuers/{id}/assets]
 
 Adds a new asset to the MAP blockchain.
 
 + Request (application/json)
 
     + Headers
-        
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
     
     + Body
     
@@ -613,6 +630,7 @@ Adds a new asset to the MAP blockchain.
         + symbol: `Token symbol` (string, required)
         + decimals: `Token decimals` (number, required)
         + supply: `Initial token supply` (number, required)
+        + network: `Blockchain networkof the targeted asset` (string, required)
         + properties: `Some other fields that will be inserted` (string, optional)
         + kya: `Asset description document` (KYA location, required)
 
@@ -620,8 +638,9 @@ Adds a new asset to the MAP blockchain.
 
     + Attributes (Asset)
     
-    
-### Register associator for asset [POST /token-issuers/{pubKey}/assets/{pubKey}/associators/{pubKey}]
+
+
+### Register associator for asset [POST /token-issuers/{id}/assets/{assetId}/associators/{associatorId}]
 
 Register associator that can issue certificate for asset wallets.
 
@@ -629,29 +648,33 @@ Register associator that can issue certificate for asset wallets.
 
     + Headers
         
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+            x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+            x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
 
 + Response 200 (application/json)
 
 
-### Unsregister associator for asset [DELETE /token-issuers/{pubKey}/assets/{pubKey}/associators/{pubKey}]
+### Unregister associator for asset [DELETE /token-issuers/{id}/assets/{assetId}/associators/{associatorId}]
 
 Unregistering associator for asset.
 
 + Request (application/json)
 
     + Headers
-        
-            X-MAP-Signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+        x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
 
 + Response 200 (application/json)
 
 
-### Update KYA [PUT /token-issuers/{pubKey}/assets/{pubKey}/kya]
+### Update KYA [PUT /token-issuers/{id}/assets/{assetId}/kya]
 
 Update KYA document properties. 
 
 + Request 
+    + Headers
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+        x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
 
     + Body 
         {
@@ -660,6 +683,8 @@ Update KYA document properties.
         }
     
     + Attributes
+        + hash: `IPFS hash of the KYA document` (string, required)
+        + url:  (string, required)
 
 + Response 200 (application/json)
 
@@ -677,38 +702,72 @@ Associators are the only entities in MAP that possess investor-wallet connection
 List wallet connection requests.
 
 + Request
+    + Headers
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+
     + Parameters
-        + status: `status of wallet connection request` (string, optional)
+        + status: `Status of wallet connection request, one of the following(PENDING, COMPLETED, REJECTED)` (string, optional)
 
 + Response 200 (application/json)
-    + Attributes 
-        +requests: `array of wallet connection request objects uids` (array[string])
+    + Attributes (array[Wallet connection request])
     
-    
-### Get wallet connection request [GET /associator/{pubKey}/requests/{uid}]
+
+### Get wallet connection request [GET /associator/{id}/requests/{uid}]
 
 Retrieve specific wallet connection request.
++ Request
+    + Headers
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
 
 + Response 200 (application/json)
-    + Attributes
-        + request: `Encrypted investor request.` (string, required)
+    + Attributes (Wallet connection request)
 
-### Update wallet connection request [PUT /associator/{pubKey}/requests/{uid}]
+### Update wallet connection request [PUT /associator/{id}/requests/{uid}]
 
-Update specific wallet connection request. This call is used to reassign identity certifications to a wallet. 
+Update specific wallet connection request. This call is used to change the status of wallet connection request. 
 
 + Request 
+    + Headers
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+        x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+
     + Body 
         {
             status: "",
-            certifications: []
         }
     
     + Attributes
-        + status: `Status of request` (string, required)
-        + certificates: `Array of certificates for wallet` (array, required)
+        + status: `Status of request, can be one of the following (PENDING, COMPLETED, REJECTED)` (string, required)
 
 + Response 200 (application/json)
+
+### Reissue certificates [POST /associator/{id}/requests/{uid}]
+
+Associators route used to reissue certificates to wallets. 
+
++ Request
+    + Headers
+        x-map-api-key: Go5Cyx4BqvkYDcrzWrfqYuGkSvkiG5z5QzY1KV32SNRx
+        x-map-signature: 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzNG8tFK3dNwQaiYA0VOuhMBOjcdydR5gyKh/IAr9rSqDXy93cVqKDZkYv/LjfLpJ8PfJKGrUovjisT9rhMWg8Z5wM=
+
+    + Body 
+        {
+           certificates: [{
+               issuer: '',
+               subject: '',
+               expiration: '',
+               type: ''
+           }]
+        }
+    
+    + Attributes
+        + issuer: `Issuers MAP id` (string, required)
+        + subject: `Subjects MAP id` (string, required)
+        + expiration: `Expiration UTC timestamp` (number, required)
+        + type: `Certificate type uid` (string, required)
+
++ Response 200 (application/json)
+    + Attributes (array[Certificate])
 
 
 # Group Investor
@@ -733,7 +792,7 @@ public key.
 Any entity wishing to check a wallet's qualification to trade a particular token can query the wallet's certificates,
 this includes applications, exchanges and even decentralized exchanges.
 
-### Send wallet connection request [POST /associator/{pubKey}/requests]
+### Send wallet connection request [POST /associator/{id}/requests]
 
 Send wallet connection request for specified asset to associator. Encrypted request data object consists of:
 
@@ -758,6 +817,7 @@ Request data object is encrypted with the designated asset's token issuer key.
         + request: `Encrypted request data.` (string, optional)
 
 + Response 200 (application/json)
+    + Attributes (array[Certificate])
 + Response 404 (application/json)
 + Response 500 (application/json)
 
@@ -806,15 +866,18 @@ using them too far into the future.
 
 Exchanges use MAP to get certificates for specified investors.
 
-### Get investor certificate [GET /certificates/{pubKey}:{uid}]
+### Find certificates [GET /certificates/{id}:{issuer}:{subject}:{type}:{uid}]
 
-Retrieve certificate for investor.
+Filter certificates using various criteria. This endpoint can be used by exchanges to search for certificates
+issued to specific investors. It can also be used to find certificates issued by exact certificate issuer for a investor.
 
 + Request (application/json)
     + Attributes
-
-        + pubKey: `Investor MAP public key` (string, required)
-        + uid: `Claim uid` (string, required)
+        + id: `Investor MAP id` (string, optional)
+        + uid: `Certificate uid` (string, optional)
+        + issuer: `Certificate issuer MAP id` (string, optional)
+        + subject: `Investor MAP id to whom the certificate was issued to` (string, optional)
+        + type: `Certificate type uid` (string, optional)
 
 + Response 200 (application/json)
 + Response 404 (application/json)
@@ -826,7 +889,8 @@ Retrieve certificate for investor.
 
 ## Token issuer (object)
 
-+ name: `The token issuer name` (string, required)
++ id: `MAP id representing unique identifier of the token issuer.` (string, required)
++ name: `The token issuer name.` (string, required)
 + publicKey: `The public key of the token issuer.` (string, optional)
 
 
@@ -839,24 +903,24 @@ Retrieve certificate for investor.
 
 
 ## certificate issuer (object)
-
++ id: `MAP id representing unique identifier of the certificate issuer.` (string, required)
 + name: `The user-provided arbitrary name of the certificate issuer.` (string, required)
-+ publicKey: `Ed25519 public key certificate issuer will use to sign objects.` (string, required)
++ publicKey: `ECDSA public key(secp256k1) that certificate issuer will use to sign objects.` (string, required)
 
 
-## Claim (object)
+## Certificate type (object)
 
-+ uid: `Generated claim uid` (string, required)
++ uid: `Generated certificate uid` (string, required)
 + description: `Description of this claim.` (string, required)
 + constraints: `Additional constrainst that may apply to the claim.` (optional)
 
 ## Certificate (object)
 
 + uid: `Generated certificate uid` (string, required)
-+ issuer: `Public key of certificate issuer.` (string, required)
-+ investor: `Public key of certificate subject.` (string, required)
-+ claim: `UID of certified claim.` (string, required)
-+ expiration: `Certificate validity.` (number, optional)
++ issuer: `MAP id of certificate issuer.` (string, required)
++ investor: `MAP id of certificate subject.` (string, required)
++ type: `UID of certified claim.` (string, required)
++ expiration: `Certificate expiration which is UTC timestamp .` (number, optional)
 
 ## KYA location (object)
 
@@ -869,3 +933,7 @@ Retrieve certificate for investor.
 + name: `The user-provided arbitrary name of the token issuer` (string, required)
 + ipfsMetadata: `The IPFS hash which contains arbitrary user-provided metadata.` (string, optional)
 + domain: `The fully qualified domain name which will be used for certificate issuer verification purposes.`
+
+## Wallet connection request (object)
+
++ request: `Encrypted request` (string, required)
